@@ -1,30 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function SplashScreen() {
   const [mounted, setMounted] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // Cek apakah di tab browser ini sudah pernah muncul splash screen
     const hasSeen = sessionStorage.getItem("recoin_splash_shown");
     if (!hasSeen) {
       setMounted(true);
       const timer = setTimeout(() => {
         setFadeOut(true);
         sessionStorage.setItem("recoin_splash_shown", "true");
-        // Hapus elemen dari DOM total setelah transisi 500ms selesai
         setTimeout(() => {
           setMounted(false);
         }, 500);
-      }, 1200);
+      }, 1600);
 
       return () => clearTimeout(timer);
     }
   }, []);
 
-  // Jika sudah tidak aktif, jangan render apa pun ke layar (agar tidak menghalangi klik)
   if (!mounted) return null;
 
   return (
@@ -33,27 +31,31 @@ export default function SplashScreen() {
         fadeOut ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 pointer-events-auto"
       }`}
     >
-      <div className="relative flex items-center justify-center mb-6">
-        <div className="absolute w-36 h-36 bg-emerald-500/20 rounded-full blur-2xl animate-pulse"></div>
-        <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-700 p-0.5 shadow-2xl shadow-emerald-500/30">
-          <div className="w-full h-full bg-[#0b1612] rounded-[22px] flex items-center justify-center text-4xl">
-            ♻️
-          </div>
-        </div>
-        <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-tr from-amber-500 to-yellow-300 rounded-full flex items-center justify-center text-lg shadow-lg shadow-amber-500/30">
-          🪙
+      {/* Efek Glow di Belakang Logo */}
+      <div className="relative flex flex-col items-center justify-center">
+        <div className="absolute w-80 h-80 bg-emerald-500/20 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
+
+        {/* LOGO RECOIN UTAMA (Langsung Tanpa Frame, Ukuran Besar) */}
+        <div className="relative z-10 w-80 sm:w-96 md:w-[420px] flex items-center justify-center animate-in zoom-in-95 duration-500">
+          <Image
+            src="/logo-recoin.png"
+            alt="RECOIN Logo"
+            width={600}
+            height={200}
+            priority
+            className="w-full h-auto object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
+          />
         </div>
       </div>
 
-      <h1 className="text-4xl font-black tracking-wider text-white">
-        RE<span className="text-amber-400">COIN</span>
-      </h1>
-      <p className="text-emerald-400 font-mono text-xs uppercase tracking-[0.3em] mt-2 animate-pulse">
+      {/* Slogan */}
+      <p className="text-emerald-400 font-mono text-xs sm:text-sm uppercase tracking-[0.4em] mt-2 animate-pulse text-center">
         Recycle Waste • Earn Coin
       </p>
 
-      <div className="w-48 h-1 bg-neutral-900 rounded-full mt-8 overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-r from-emerald-500 to-amber-400 animate-[shimmer_1.5s_infinite]"></div>
+      {/* Progress Shimmer Bar */}
+      <div className="w-56 sm:w-64 h-1.5 bg-neutral-900 rounded-full mt-8 overflow-hidden border border-emerald-950/80 shadow-inner">
+        <div className="w-full h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-500 animate-[shimmer_1.5s_infinite]"></div>
       </div>
     </div>
   );

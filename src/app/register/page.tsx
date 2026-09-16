@@ -5,10 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/lib/storage";
 import { useTheme } from "@/lib/theme";
+import { useLanguage } from "@/lib/language";
+import { CoinEmblem } from "@/components/Emblems";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const isDark = theme === "dark";
 
   const [fullName, setFullName] = useState("");
@@ -30,6 +33,8 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
+
+    // Payload pendaftaran yang sudah sesuai dengan interface UserAccount terbaru
     const res = registerUser({
       id: "REC-" + Date.now().toString(36).toUpperCase(),
       fullName,
@@ -37,7 +42,9 @@ export default function RegisterPage() {
       password,
       phone,
       ewalletType: ewallet,
-      totalEarnedRupiah: 0,
+      coinBalance: 0,
+      totalCoinsEarned: 0,
+      totalRupiahWithdrawn: 0,
       totalGrams: 0,
       createdAt: new Date().toLocaleDateString("id-ID"),
     });
@@ -55,41 +62,49 @@ export default function RegisterPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-6 transition-colors duration-300 selection:bg-emerald-500 selection:text-black"
+      className="min-h-screen flex items-center justify-center p-6 transition-colors duration-300"
       style={{
-        backgroundColor: isDark ? "#070d0a" : "#f4f7f5",
-        color: isDark ? "#ffffff" : "#111827",
+        backgroundColor: isDark ? "#0d1512" : "#f1f4f1",
+        color: isDark ? "#f3f4f6" : "#1c2520",
       }}
     >
       <div
-        className="w-full max-w-md border rounded-3xl p-8 shadow-2xl relative transition"
+        className="w-full max-w-md border rounded-2xl p-8 shadow-sm relative transition"
         style={{
-          backgroundColor: isDark ? "#0e1d16" : "#ffffff",
-          borderColor: isDark ? "rgba(6,78,59,0.6)" : "#e2e8f0",
+          backgroundColor: isDark ? "#141e1a" : "#ffffff",
+          borderColor: isDark ? "rgba(255, 255, 255, 0.08)" : "#dfe5e0",
+          boxShadow: isDark ? "none" : "0 8px 30px -4px rgba(22, 32, 27, 0.06)",
         }}
       >
         <div className="text-center mb-6">
           <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-3 border"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-3 border font-semibold"
             style={{
-              backgroundColor: isDark ? "rgba(6,78,59,0.8)" : "#d1fae5",
-              borderColor: isDark ? "rgba(16,185,129,0.4)" : "#a7f3d0",
-              color: isDark ? "#34d399" : "#065f46",
+              backgroundColor: isDark ? "rgba(46, 125, 50, 0.2)" : "#e5eee7",
+              borderColor: isDark ? "rgba(76, 175, 80, 0.3)" : "#c6d8cb",
+              color: isDark ? "#a5d6a7" : "#246b3e",
             }}
           >
             PORTAL PENGGUNA
           </div>
-          <h1 className="text-2xl md:text-3xl font-black">Register Akun RECOIN</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Register Akun RECOIN</h1>
           <p
             className="text-xs mt-1"
-            style={{ color: isDark ? "#a3a3a3" : "#6b7280" }}
+            style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}
           >
             Kaitkan nomor e-wallet untuk pencairan instan di mesin vending.
           </p>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-red-950/80 border border-red-500/50 text-red-300 text-xs text-center font-medium">
+          <div
+            className="mb-4 p-3 rounded-xl border text-xs text-center font-medium"
+            style={{
+              backgroundColor: isDark ? "rgba(185, 28, 28, 0.2)" : "#fef2f2",
+              borderColor: isDark ? "rgba(239, 68, 68, 0.3)" : "#fecaca",
+              color: isDark ? "#f87171" : "#b91c1c",
+            }}
+          >
             ⚠️ {errorMsg}
           </div>
         )}
@@ -97,8 +112,8 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
           <div>
             <label
-              className="block text-[11px] font-bold uppercase tracking-wider mb-1"
-              style={{ color: isDark ? "#a3a3a3" : "#6b7280" }}
+              className="block text-[11px] font-semibold uppercase tracking-wider mb-1"
+              style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}
             >
               Nama Lengkap
             </label>
@@ -109,11 +124,11 @@ export default function RegisterPage() {
               placeholder="Masukkan nama lengkap akun"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition focus:border-emerald-400"
+              className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition focus:border-[#2e7d32]"
               style={{
-                backgroundColor: isDark ? "#09140f" : "#f9fafb",
-                borderColor: isDark ? "rgba(6,78,59,0.8)" : "#cbd5e1",
-                color: isDark ? "#ffffff" : "#111827",
+                backgroundColor: isDark ? "#101915" : "#f6faf7",
+                borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                color: isDark ? "#f3f4f6" : "#16201b",
               }}
             />
           </div>
@@ -121,8 +136,8 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label
-                className="block text-[11px] font-bold uppercase tracking-wider mb-1"
-                style={{ color: isDark ? "#a3a3a3" : "#6b7280" }}
+                className="block text-[11px] font-semibold uppercase tracking-wider mb-1"
+                style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}
               >
                 Nomor HP (E-Wallet)
               </label>
@@ -133,29 +148,29 @@ export default function RegisterPage() {
                 placeholder="08xxxxxxxxxx"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition font-mono focus:border-emerald-400"
+                className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition font-mono focus:border-[#2e7d32]"
                 style={{
-                  backgroundColor: isDark ? "#09140f" : "#f9fafb",
-                  borderColor: isDark ? "rgba(6,78,59,0.8)" : "#cbd5e1",
-                  color: isDark ? "#ffffff" : "#111827",
+                  backgroundColor: isDark ? "#101915" : "#f6faf7",
+                  borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                  color: isDark ? "#f3f4f6" : "#16201b",
                 }}
               />
             </div>
             <div>
               <label
-                className="block text-[11px] font-bold uppercase tracking-wider mb-1"
-                style={{ color: isDark ? "#a3a3a3" : "#6b7280" }}
+                className="block text-[11px] font-semibold uppercase tracking-wider mb-1"
+                style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}
               >
                 Pilihan E-Wallet
               </label>
               <select
                 value={ewallet}
                 onChange={(e) => setEwallet(e.target.value)}
-                className="w-full rounded-xl px-3 py-3 text-sm outline-none border transition cursor-pointer focus:border-emerald-400"
+                className="w-full rounded-xl px-3 py-3 text-sm outline-none border transition cursor-pointer focus:border-[#2e7d32]"
                 style={{
-                  backgroundColor: isDark ? "#09140f" : "#f9fafb",
-                  borderColor: isDark ? "rgba(6,78,59,0.8)" : "#cbd5e1",
-                  color: isDark ? "#ffffff" : "#111827",
+                  backgroundColor: isDark ? "#101915" : "#f6faf7",
+                  borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                  color: isDark ? "#f3f4f6" : "#16201b",
                 }}
               >
                 <option value="GoPay">GoPay</option>
@@ -167,8 +182,8 @@ export default function RegisterPage() {
 
           <div>
             <label
-              className="block text-[11px] font-bold uppercase tracking-wider mb-1"
-              style={{ color: isDark ? "#a3a3a3" : "#6b7280" }}
+              className="block text-[11px] font-semibold uppercase tracking-wider mb-1"
+              style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}
             >
               Email
             </label>
@@ -179,19 +194,19 @@ export default function RegisterPage() {
               placeholder="nama@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition focus:border-emerald-400"
+              className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition focus:border-[#2e7d32]"
               style={{
-                backgroundColor: isDark ? "#09140f" : "#f9fafb",
-                borderColor: isDark ? "rgba(6,78,59,0.8)" : "#cbd5e1",
-                color: isDark ? "#ffffff" : "#111827",
+                backgroundColor: isDark ? "#101915" : "#f6faf7",
+                borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                color: isDark ? "#f3f4f6" : "#16201b",
               }}
             />
           </div>
 
           <div>
             <label
-              className="block text-[11px] font-bold uppercase tracking-wider mb-1"
-              style={{ color: isDark ? "#a3a3a3" : "#6b7280" }}
+              className="block text-[11px] font-semibold uppercase tracking-wider mb-1"
+              style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}
             >
               Password
             </label>
@@ -203,18 +218,18 @@ export default function RegisterPage() {
                 placeholder="Buat kata sandi aman"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition pr-11 focus:border-emerald-400"
+                className="w-full rounded-xl px-4 py-3 text-sm outline-none border transition pr-11 focus:border-[#2e7d32]"
                 style={{
-                  backgroundColor: isDark ? "#09140f" : "#f9fafb",
-                  borderColor: isDark ? "rgba(6,78,59,0.8)" : "#cbd5e1",
-                  color: isDark ? "#ffffff" : "#111827",
+                  backgroundColor: isDark ? "#101915" : "#f6faf7",
+                  borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                  color: isDark ? "#f3f4f6" : "#16201b",
                 }}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 p-1 transition cursor-pointer"
-                style={{ color: isDark ? "#a3a3a3" : "#6b7280" }}
+                style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}
                 title={showPassword ? "Sembunyikan Kata Sandi" : "Lihat Kata Sandi"}
               >
                 {showPassword ? (
@@ -234,25 +249,33 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full mt-3 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-neutral-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20 active:scale-[0.99] cursor-pointer"
+            className="w-full mt-3 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm cursor-pointer flex items-center justify-center gap-2"
+            style={{
+              backgroundColor: isDark ? "#d97706" : "#f59e0b",
+              color: isDark ? "#ffffff" : "#16201b",
+            }}
           >
-            {isLoading ? "Mendaftarkan Akun..." : "REGISTER AKUN BARU 🪙"}
+            <CoinEmblem size={16} />
+            <span>{isLoading ? "Mendaftarkan Akun..." : "REGISTER AKUN BARU"}</span>
           </button>
         </form>
 
         <div
           className="mt-6 pt-4 border-t text-center text-xs"
           style={{
-            borderColor: isDark ? "rgba(6,78,59,0.5)" : "#e2e8f0",
-            color: isDark ? "#a3a3a3" : "#6b7280",
+            borderColor: isDark ? "rgba(255, 255, 255, 0.08)" : "#dfe5e0",
+            color: isDark ? "#9ca3af" : "#5d6d66",
           }}
         >
           Sudah punya akun?{" "}
-          <Link href="/login" className="text-emerald-500 font-bold hover:underline">
+          <Link
+            href="/login"
+            className="font-semibold hover:underline"
+            style={{ color: isDark ? "#81c784" : "#2e7d32" }}
+          >
             Masuk di sini
           </Link>
         </div>
-
       </div>
     </div>
   );

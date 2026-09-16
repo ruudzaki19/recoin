@@ -1,51 +1,70 @@
 "use client";
 
 import { useState } from "react";
-import { loginUser, registerUser, UserAccount } from "@/lib/storage";
+import { loginUser, registerUser, getActiveUser, UserAccount } from "@/lib/storage";
+import { useTheme } from "@/lib/theme";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (user: UserAccount) => void;
-  initialMode?: "login" | "register";
+  onSuccess?: (user: UserAccount) => void;
 }
 
-export default function AuthModal({
-  isOpen,
-  onClose,
-  onSuccess,
-  initialMode = "login",
-}: AuthModalProps) {
-  const [mode, setMode] = useState<"login" | "register">(initialMode);
+export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [ewallet, setEwallet] = useState<"GoPay" | "DANA" | "OVO">("GoPay");
+  const [ewallet, setEwallet] = useState("GoPay");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
+    setIsLoading(true);
 
     if (mode === "login") {
       const res = loginUser(email, password);
-      if (res.success && res.user) {
-        onSuccess(res.user);
+      setIsLoading(false);
+      if (res.success) {
+        const active = getActiveUser();
+        if (active && onSuccess) onSuccess(active);
         onClose();
       } else {
         setErrorMsg(res.message);
       }
     } else {
-      if (!fullName || !phone || !email || !password) {
-        setErrorMsg("Lengkapi semua data pendaftaran.");
+      if (!fullName || !phone) {
+        setIsLoading(false);
+        setErrorMsg("Nama lengkap dan nomor HP wajib diisi.");
         return;
       }
-      const res = registerUser(fullName, email, password, phone, ewallet);
-      if (res.success && res.user) {
-        onSuccess(res.user);
+
+      const res = registerUser({
+        id: "REC-" + Date.now().toString(36).toUpperCase(),
+        fullName,
+        email,
+        password,
+        phone,
+        ewalletType: ewallet,
+        coinBalance: 0,
+        totalCoinsEarned: 0,
+        totalRupiahWithdrawn: 0,
+        totalGrams: 0,
+        createdAt: new Date().toLocaleDateString("id-ID"),
+      });
+
+      setIsLoading(false);
+      if (res.success) {
+        const active = getActiveUser();
+        if (active && onSuccess) onSuccess(active);
         onClose();
       } else {
         setErrorMsg(res.message);
@@ -54,89 +73,72 @@ export default function AuthModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-md bg-gradient-to-b from-[#0e1d16] to-[#070d0a] border border-emerald-500/30 rounded-3xl p-8 shadow-2xl shadow-emerald-500/10 text-white">
-        {/* Tombol Tutup */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div
+        className="w-full max-w-md rounded-2xl border p-6 shadow-2xl relative"
+        style={{
+          backgroundColor: isDark ? "#141e1a" : "#ffffff",
+          borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+          color: isDark ? "#f3f4f6" : "#16201b",
+        }}
+      >
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 text-neutral-400 hover:text-white transition text-lg"
+          className="absolute right-4 top-4 text-sm p-1 transition opacity-70 hover:opacity-100 cursor-pointer"
         >
           ✕
         </button>
 
-        {/* Header Modal */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-amber-400 text-2xl shadow-lg shadow-emerald-500/20 mb-3">
-            ♻️
-          </div>
-          <h2 className="text-2xl font-black tracking-tight">
-            {mode === "login" ? "Masuk ke Akun RECOIN" : "Buat Akun RECOIN Baru"}
+        <div className="text-center mb-5">
+          <h2 className="text-xl font-bold">
+            {mode === "login" ? "Masuk ke Akun RECOIN" : "Daftar Akun Baru"}
           </h2>
-          <p className="text-xs text-neutral-400 mt-1">
+          <p className="text-xs mt-1" style={{ color: isDark ? "#9ca3af" : "#5d6d66" }}>
             {mode === "login"
-              ? "Kaitkan e-wallet & kumpulkan saldo dari sampahmu"
-              : "Daftar sekali untuk akses semua mesin vending RECOIN"}
+              ? "Masuk untuk melanjutkan transaksi setoran atau penarikan."
+              : "Buat akun untuk mengumpulkan koin dari sampah daur ulang."}
           </p>
         </div>
 
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-red-950/80 border border-red-500/50 text-red-300 text-xs text-center font-medium">
-            {errorMsg}
+          <div
+            className="mb-4 p-3 rounded-xl border text-xs text-center font-medium"
+            style={{
+              backgroundColor: isDark ? "rgba(185, 28, 28, 0.2)" : "#fef2f2",
+              borderColor: isDark ? "rgba(239, 68, 68, 0.3)" : "#fecaca",
+              color: isDark ? "#f87171" : "#b91c1c",
+            }}
+          >
+            ⚠️ {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           {mode === "register" && (
-            <>
-              <div>
-                <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
-                  Nama Lengkap
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Contoh: Ruud Zaki"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-[#070d0a] border border-emerald-950 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm outline-none transition"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
-                    No. Handphone
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="08xxxxxxxxxx"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-[#070d0a] border border-emerald-950 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm outline-none transition font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
-                    Default E-Wallet
-                  </label>
-                  <select
-                    value={ewallet}
-                    onChange={(e) => setEwallet(e.target.value as "GoPay" | "DANA" | "OVO")}
-                    className="w-full bg-[#070d0a] border border-emerald-950 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-sm outline-none transition"
-                  >
-                    <option value="GoPay">GoPay</option>
-                    <option value="DANA">DANA</option>
-                    <option value="OVO">OVO</option>
-                  </select>
-                </div>
-              </div>
-            </>
+            <div>
+              <label className="text-[11px] font-semibold uppercase tracking-wider block mb-1">
+                Nama Lengkap
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Nama lengkap"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
+                style={{
+                  backgroundColor: isDark ? "#101915" : "#f6faf7",
+                  borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                  color: isDark ? "#f3f4f6" : "#16201b",
+                }}
+              />
+            </div>
           )}
 
           <div>
-            <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
-              Alamat Email
+            <label className="text-[11px] font-semibold uppercase tracking-wider block mb-1">
+              Email
             </label>
             <input
               type="email"
@@ -144,12 +146,17 @@ export default function AuthModal({
               placeholder="nama@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-[#070d0a] border border-emerald-950 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm outline-none transition"
+              className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
+              style={{
+                backgroundColor: isDark ? "#101915" : "#f6faf7",
+                borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                color: isDark ? "#f3f4f6" : "#16201b",
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
+            <label className="text-[11px] font-semibold uppercase tracking-wider block mb-1">
               Kata Sandi
             </label>
             <input
@@ -158,22 +165,81 @@ export default function AuthModal({
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#070d0a] border border-emerald-950 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm outline-none transition"
+              className="w-full px-3.5 py-2.5 rounded-xl border text-sm outline-none"
+              style={{
+                backgroundColor: isDark ? "#101915" : "#f6faf7",
+                borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                color: isDark ? "#f3f4f6" : "#16201b",
+              }}
             />
           </div>
 
+          {mode === "register" && (
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-wider block mb-1">
+                  Nomor HP
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="08xxxxxxx"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border text-sm font-mono outline-none"
+                  style={{
+                    backgroundColor: isDark ? "#101915" : "#f6faf7",
+                    borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                    color: isDark ? "#f3f4f6" : "#16201b",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-wider block mb-1">
+                  E-Wallet
+                </label>
+                <select
+                  value={ewallet}
+                  onChange={(e) => setEwallet(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border text-sm outline-none cursor-pointer"
+                  style={{
+                    backgroundColor: isDark ? "#101915" : "#f6faf7",
+                    borderColor: isDark ? "rgba(255, 255, 255, 0.12)" : "#dfe5e0",
+                    color: isDark ? "#f3f4f6" : "#16201b",
+                  }}
+                >
+                  <option value="GoPay">GoPay</option>
+                  <option value="DANA">DANA</option>
+                  <option value="OVO">OVO</option>
+                </select>
+              </div>
+            </div>
+          )}
+
           <button
             type="submit"
-            className="w-full mt-2 py-3.5 rounded-xl bg-gradient-to-r from-emerald-400 to-amber-400 hover:from-emerald-300 hover:to-amber-300 text-neutral-950 font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20"
+            disabled={isLoading}
+            className="w-full mt-2 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition shadow-sm cursor-pointer disabled:opacity-50"
+            style={{ backgroundColor: "#2e7d32" }}
           >
-            {mode === "login" ? "Masuk Sekarang" : "Buat Akun & Mulai"}
+            {isLoading
+              ? "Memproses..."
+              : mode === "login"
+              ? "Masuk Sekarang"
+              : "Daftar Akun"}
           </button>
         </form>
 
-        {/* Tab Beralih Mode */}
-        <div className="mt-6 pt-4 border-t border-emerald-950/80 text-center text-xs text-neutral-400">
+        <div
+          className="mt-4 pt-3 border-t text-center text-xs"
+          style={{
+            borderColor: isDark ? "rgba(255, 255, 255, 0.08)" : "#dfe5e0",
+            color: isDark ? "#9ca3af" : "#5d6d66",
+          }}
+        >
           {mode === "login" ? (
-            <p>
+            <span>
               Belum punya akun?{" "}
               <button
                 type="button"
@@ -181,13 +247,14 @@ export default function AuthModal({
                   setMode("register");
                   setErrorMsg("");
                 }}
-                className="text-amber-400 font-bold hover:underline"
+                className="font-semibold underline cursor-pointer"
+                style={{ color: isDark ? "#81c784" : "#2e7d32" }}
               >
-                Daftar sekarang
+                Daftar di sini
               </button>
-            </p>
+            </span>
           ) : (
-            <p>
+            <span>
               Sudah punya akun?{" "}
               <button
                 type="button"
@@ -195,11 +262,12 @@ export default function AuthModal({
                   setMode("login");
                   setErrorMsg("");
                 }}
-                className="text-emerald-400 font-bold hover:underline"
+                className="font-semibold underline cursor-pointer"
+                style={{ color: isDark ? "#81c784" : "#2e7d32" }}
               >
                 Masuk di sini
               </button>
-            </p>
+            </span>
           )}
         </div>
       </div>

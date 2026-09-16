@@ -4,160 +4,323 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 export type Language = "id" | "en";
 
-export const translations = {
+export interface Translations {
+  // Navbar
+  navHome: string;
+  navCatalog: string;
+  navKiosk: string;
+  navAbout: string;
+  navLogin: string;
+  navRegister: string;
+  navLogout: string;
+  navConnectedAccount: string;
+  navWalletTitle: string;
+  navCoinBalance: string;
+  navWithdrawAction: string;
+  navManageProfile: string;
+
+  // Hero Section
+  heroBadge: string;
+  heroTitle1: string;
+  heroTitleHighlight: string;
+  heroDesc: string;
+  btnDeposit: string;
+  btnWithdraw: string;
+
+  // Stats
+  statGlobalCoinsLabel: string;
+  statGlobalGramsLabel: string;
+  walletBadge: string;
+  walletCoinsLabel: string;
+  walletGramsLabel: string;
+  walletWithdrawnLabel: string;
+
+  // Rates Section
+  ratesBadge: string;
+  ratesTitle: string;
+  ratesDesc: string;
+  ratesPer10g: string;
+  canName: string;
+  canDesc: string;
+  snackName: string;
+  snackDesc: string;
+  paperName: string;
+  paperDesc: string;
+
+  // Calculator
+  calcBadge: string;
+  calcTitle: string;
+  calcSelectTrash: string;
+  calcEstWeight: string;
+  calcPotentialCoins: string;
+  calcNote: string;
+
+  // Kiosk Page
+  kioskTitle: string;
+  kioskSubtitleConnected: string;
+  kioskSubtitleGuest: string;
+  stepDepositTitle: string;
+  stepDepositLabelCategory: string;
+  stepDepositSensorLabel: string;
+  stepDepositPayoutLabel: string;
+  stepDepositBtn: string;
+  stepDepositProcessing: string;
+
+  stepWithdrawTitle: string;
+  stepWithdrawCoinsLabel: string;
+  stepWithdrawEstRupiah: string;
+  stepWithdrawRateNote: string;
+  stepWithdrawEwalletLabel: string;
+  stepWithdrawPhoneLabel: string;
+  stepWithdrawBtn: string;
+  stepWithdrawProcessing: string;
+
+  withdrawErrLogin: string;
+  withdrawErrAmount: string;
+  withdrawErrInsufficient: string;
+  withdrawErrPhone: string;
+
+  // Receipts
+  receiptDepositSuccess: string;
+  receiptDepositDesc: string;
+  receiptWithdrawSuccess: string;
+  receiptWithdrawDesc: string;
+  receiptId: string;
+  receiptTime: string;
+  receiptDepositor: string;
+  receiptRecipient: string;
+  receiptTrashType: string;
+  receiptWeight: string;
+  receiptEstRate: string;
+  receiptEwallet: string;
+  receiptPhone: string;
+  receiptCoinsExchanged: string;
+  receiptStatus: string;
+  receiptStatusSuccess: string;
+  receiptStatusWithdrawn: string;
+  btnWeighAgain: string;
+  btnRedeemCoins: string;
+  btnBackHome: string;
+  btnDone: string;
+
+  // Footer
+  footerText: string;
+}
+
+const dictionaries: Record<Language, Translations> = {
   id: {
-    // Navbar
-    navHome: "Home",
-    navCatalog: "Katalog Nilai",
+    navHome: "Beranda",
+    navCatalog: "Katalog Sampah",
+    navKiosk: "Kios & Transaksi",
     navAbout: "Tentang Kami",
-    navLogin: "Login",
-    navRegister: "Register",
-    navManageProfile: "Kelola Profil & Pengaturan",
+    navLogin: "Masuk",
+    navRegister: "Daftar",
     navLogout: "Keluar Akun",
     navConnectedAccount: "Akun Terhubung",
+    navWalletTitle: "Dompet RECOIN",
+    navCoinBalance: "Saldo Koin:",
+    navWithdrawAction: "Tukar Koin ke E-Wallet",
+    navManageProfile: "Kelola Profil Akun",
 
-    // Home
+    heroBadge: "Reverse Vending Machine Berbasis Koin Presisi",
     heroTitle1: "Timbang Sampahmu,",
-    heroTitle2: "Cairkan Saldo E-Wallet",
+    heroTitleHighlight: "Kumpulkan Koin, Cairkan E-Wallet",
     heroDesc:
-      "Solusi sirkular modern untuk mengonversi sampah kaleng minuman dan kemasan makanan menjadi saldo instan ke GoPay, DANA, dan OVO secara presisi per 10 gram.",
-    heroCta: "Mulai Setor di Kios",
-    globalStatBadge: "Total Dampak Bersama Seluruh Pengguna",
-    globalTotalEarned: "Total Saldo Tersalurkan (Semua User)",
-    globalTotalWeight: "Total Sampah Terkumpul (Semua User)",
-    userStatBadge: "Statistik Khusus Akun:",
-    userTotalEarned: "Saldo Tersalurkan ke Akun Saya",
-    userTotalWeight: "Total Sampah Terkumpul Saya",
-    userTotalDeposits: "Total Penyetoran Saya",
-    categoryBadge: "Nilai Tukar Transparan",
-    categoryTitle: "Kategori Sampah Diterima",
-    canTitle: "Kaleng Minuman (Aluminium)",
-    canDesc: "Kaleng soda, teh, larutan, dan kopi aluminium dalam kondisi bersih tanpa sisa air.",
-    snackTitle: "Kemasan Makanan / Snack",
-    snackDesc: "Bungkus biskuit, sachet makanan ringan, mie instan berbahan plastik multilayer kering.",
-    ratePer10g: "Harga per 10 gram",
-    calcBadge: "Simulasi Penghasilan",
-    calcTitle: "Kalkulator Saldo RECOIN",
-    calcSelectTrash: "Pilih Sampah",
-    calcEstimatedWeight: "Estimasi Berat",
-    calcPayoutTitle: "Potensi Saldo Cair",
-    calcPayoutDesc: "Langsung masuk ke saldo akun & dapat ditarik via GoPay/DANA/OVO.",
-    liveActivityBadge: "Transparansi Mesin",
-    liveActivityTitle: "Aktivitas Penyetoran Terkini",
-    liveSyncText: "Sinkron langsung dari memori mesin",
-    noTransactions: "Belum ada transaksi di mesin.",
-    firstDepositPrompt: "Jadilah orang pertama yang setor sampah di mesin →",
-    weightLabel: "Berat",
-    payoutToLabel: "Cair ke",
+      "Konversi sampah kaleng, kemasan makanan, dan kertas menjadi RECOIN secara presisi per 10 gram. Kumpulkan koinnya dan tukar langsung menjadi saldo GoPay, DANA, dan OVO.",
+    btnDeposit: "Setor Sampah di Mesin",
+    btnWithdraw: "Tukar Koin ke Saldo",
 
-    // Profile & Settings
-    profileTitle: "Pengaturan & Akun Pengguna",
-    profileSubtitle: "Kelola foto profil, identitas e-wallet, dan preferensi bahasa sistem",
-    changeAvatarText: "Klik ikon kamera untuk mengganti foto profil",
-    fullNameLabel: "Nama Lengkap",
-    emailLabel: "Alamat Email (Permanen)",
-    phoneLabel: "No. Handphone E-Wallet",
-    ewalletLabel: "Default E-Wallet Pencairan",
-    saveProfileBtn: "Simpan Perubahan Profil",
-    savingProfileBtn: "Menyimpan...",
-    saveSuccessMsg: "Profil dan preferensi berhasil diperbarui!",
-    
-    // Language Setting Section in Profile
-    langSectionTitle: "Preferensi Bahasa / Language Preference",
-    langSectionDesc: "Pilih bahasa tampilan antarmuka yang diinginkan untuk seluruh platform RECOIN.",
-    langId: "Bahasa Indonesia",
-    langEn: "English",
-    langActiveBadge: "Aktif",
-    
-    // Misc
-    times: "Kali",
+    statGlobalCoinsLabel: "Total Koin Didistribusikan ke Semua Pengguna",
+    statGlobalGramsLabel: "Total Berat Sampah Terkumpul di Seluruh Mesin",
+    walletBadge: "Dompet Akun:",
+    walletCoinsLabel: "Saldo Koin Siap Ditarik",
+    walletGramsLabel: "Total Sampah Disetor",
+    walletWithdrawnLabel: "Total Saldo Sudah Dicairkan",
+
+    ratesBadge: "3 Kategori Limbah Diterima",
+    ratesTitle: "Nilai Perolehan RECOIN",
+    ratesDesc:
+      "Mesin mendeteksi jenis limbah dan menghitung koin secara presisi setiap 10 gram. Nilai tukar: 1 RECOIN = Rp 10.",
+    ratesPer10g: "Koin per 10g",
+    canName: "Kaleng Minuman (Aluminium)",
+    canDesc: "Kaleng soda, teh, larutan, dan kopi aluminium bersih & kering.",
+    snackName: "Kemasan Makanan / Plastik",
+    snackDesc: "Bungkus biskuit, sachet camilan, dan kemasan multilayer kering.",
+    paperName: "Kertas & Kardus (Paper)",
+    paperDesc: "Kardus cokelat, kertas HVS bekas, majalah, dan karton bersih.",
+
+    calcBadge: "Simulasi Timbangan",
+    calcTitle: "Kalkulator Perolehan RECOIN",
+    calcSelectTrash: "Pilih Sampah:",
+    calcEstWeight: "Estimasi Berat Ditimbang",
+    calcPotentialCoins: "Potensi Koin Yang Didapat",
+    calcNote: "Koin akan otomatis tersimpan di dompet akunmu saat proses penimbangan selesai di menu Kios.",
+
+    kioskTitle: "Kios Timbang & Penukaran Koin",
+    kioskSubtitleConnected: "Akun Terhubung:",
+    kioskSubtitleGuest: "Anda menyetor sebagai Tamu. Silakan login agar koin tersimpan di akun Anda.",
+    stepDepositTitle: "Setor Sampah & Klaim Koin",
+    stepDepositLabelCategory: "Pilih Jenis Sampah Masuk",
+    stepDepositSensorLabel: "Berat Timbangan Sensor (Gram)",
+    stepDepositPayoutLabel: "RECOIN Didapat:",
+    stepDepositBtn: "SETOR & KLAIM KOIN SEKARANG",
+    stepDepositProcessing: "Memproses Timbangan...",
+
+    stepWithdrawTitle: "Tukar Koin & Cairkan Saldo E-Wallet",
+    stepWithdrawCoinsLabel: "Jumlah Koin Mau Ditukar",
+    stepWithdrawEstRupiah: "Estimasi Rupiah Didapat",
+    stepWithdrawRateNote: "1 Koin = Rp10",
+    stepWithdrawEwalletLabel: "Tujuan E-Wallet",
+    stepWithdrawPhoneLabel: "Nomor HP Akun",
+    stepWithdrawBtn: "TUKAR KOIN & CAIRKAN SEKARANG",
+    stepWithdrawProcessing: "Memproses Transfer Saldo...",
+
+    withdrawErrLogin: "Silakan login terlebih dahulu untuk menukarkan koin.",
+    withdrawErrAmount: "Silakan masukkan jumlah koin yang ingin ditukarkan.",
+    withdrawErrInsufficient: "Saldo koin tidak mencukupi.",
+    withdrawErrPhone: "Nomor akun e-wallet wajib diisi.",
+
+    receiptDepositSuccess: "Penyetoran Berhasil",
+    receiptDepositDesc: "Koin berhasil ditambahkan ke dompet akun Anda",
+    receiptWithdrawSuccess: "Pencairan Saldo Berhasil",
+    receiptWithdrawDesc: "Saldo berhasil ditransfer ke e-wallet",
+    receiptId: "ID Transaksi",
+    receiptTime: "Waktu",
+    receiptDepositor: "Penyetor",
+    receiptRecipient: "Penerima Dana",
+    receiptTrashType: "Jenis Sampah",
+    receiptWeight: "Total Berat",
+    receiptEstRate: "Estimasi Nilai Tukar",
+    receiptEwallet: "E-Wallet Tujuan",
+    receiptPhone: "Nomor HP Akun",
+    receiptCoinsExchanged: "Koin Ditukarkan",
+    receiptStatus: "Status Transaksi",
+    receiptStatusSuccess: "Sukses Ditambahkan",
+    receiptStatusWithdrawn: "Sukses Masuk",
+    btnWeighAgain: "Timbang Lagi",
+    btnRedeemCoins: "Tukar Koin",
+    btnBackHome: "Kembali ke Beranda",
+    btnDone: "Selesai",
+
+    footerText: "© 2026 RECOIN Eco-Smart Vending Machine Platform.",
   },
   en: {
-    // Navbar
     navHome: "Home",
-    navCatalog: "Value Rates",
+    navCatalog: "Waste Catalog",
+    navKiosk: "Kiosk & Trade",
     navAbout: "About Us",
     navLogin: "Login",
     navRegister: "Register",
-    navManageProfile: "Profile & Settings",
-    navLogout: "Log Out",
+    navLogout: "Sign Out",
     navConnectedAccount: "Connected Account",
+    navWalletTitle: "RECOIN Wallet",
+    navCoinBalance: "Coin Balance:",
+    navWithdrawAction: "Redeem Coins to E-Wallet",
+    navManageProfile: "Manage Account Profile",
 
-    // Home
+    heroBadge: "Precision Coin-Based Reverse Vending Machine",
     heroTitle1: "Weigh Your Recyclables,",
-    heroTitle2: "Cash Out to E-Wallet",
+    heroTitleHighlight: "Earn Coins, Cash Out to E-Wallet",
     heroDesc:
-      "Modern circular solution converting aluminium beverage cans and snack wrappers into instant balance on GoPay, DANA, and OVO with precise 10-gram calculation.",
-    heroCta: "Start Deposit at Kiosk",
-    globalStatBadge: "Community Impact Across All Users",
-    globalTotalEarned: "Total Payout Disbursed (All Users)",
-    globalTotalWeight: "Total Waste Collected (All Users)",
-    userStatBadge: "Account Summary for:",
-    userTotalEarned: "Balance Received in My Account",
-    userTotalWeight: "My Total Recycled Weight",
-    userTotalDeposits: "My Total Deposits",
-    categoryBadge: "Transparent Exchange Rates",
-    categoryTitle: "Accepted Waste Categories",
-    canTitle: "Beverage Cans (Aluminium)",
-    canDesc: "Clean and dry aluminium soda, tea, or coffee cans without residual fluids.",
-    snackTitle: "Snack & Food Packaging",
-    snackDesc: "Dry multilayer plastic wrappers of biscuits, snacks, and instant noodles.",
-    ratePer10g: "Rate per 10 grams",
-    calcBadge: "Earnings Simulation",
-    calcTitle: "RECOIN Balance Calculator",
-    calcSelectTrash: "Select Waste Category",
-    calcEstimatedWeight: "Estimated Weight",
-    calcPayoutTitle: "Potential Cash Out",
-    calcPayoutDesc: "Instantly credited to your balance and withdrawal-ready via GoPay/DANA/OVO.",
-    liveActivityBadge: "Machine Transparency",
-    liveActivityTitle: "Latest Deposit Activity",
-    liveSyncText: "Real-time sync from vending machine memory",
-    noTransactions: "No machine transactions recorded yet.",
-    firstDepositPrompt: "Be the first to deposit waste into the machine →",
-    weightLabel: "Weight",
-    payoutToLabel: "Transferred to",
+      "Convert cans, food packaging, and paper into RECOIN with 10g precision. Accumulate coins and withdraw directly to GoPay, DANA, and OVO.",
+    btnDeposit: "Deposit Waste at Machine",
+    btnWithdraw: "Redeem Coins to Cash",
 
-    // Profile & Settings
-    profileTitle: "User Profile & Settings",
-    profileSubtitle: "Manage your profile picture, e-wallet payout info, and language preferences",
-    changeAvatarText: "Click the camera icon to update profile picture",
-    fullNameLabel: "Full Name",
-    emailLabel: "Email Address (Permanent)",
-    phoneLabel: "E-Wallet Phone Number",
-    ewalletLabel: "Default E-Wallet Destination",
-    saveProfileBtn: "Save Profile Changes",
-    savingProfileBtn: "Saving...",
-    saveSuccessMsg: "Profile and preferences updated successfully!",
+    statGlobalCoinsLabel: "Total Coins Distributed Across All Users",
+    statGlobalGramsLabel: "Total Recycled Waste Collected Across All Machines",
+    walletBadge: "Account Wallet:",
+    walletCoinsLabel: "Available Coins to Withdraw",
+    walletGramsLabel: "Total Waste Deposited",
+    walletWithdrawnLabel: "Total Balance Cashed Out",
 
-    // Language Setting Section in Profile
-    langSectionTitle: "Language Preferences",
-    langSectionDesc: "Choose your preferred display language across the entire RECOIN platform.",
-    langId: "Bahasa Indonesia",
-    langEn: "English",
-    langActiveBadge: "Active",
+    ratesBadge: "3 Accepted Waste Categories",
+    ratesTitle: "RECOIN Earnings Value",
+    ratesDesc:
+      "The kiosk verifies material composition and measures coins per 10 grams. Exchange rate: 1 RECOIN = Rp 10.",
+    ratesPer10g: "Coins per 10g",
+    canName: "Beverage Cans (Aluminium)",
+    canDesc: "Clean & dry aluminium cans of soda, tea, coffee, and drinks.",
+    snackName: "Food Packaging / Plastic",
+    snackDesc: "Dry biscuit wrappers, snack sachets, and multilayer packaging.",
+    paperName: "Paper & Cardboard (Paper)",
+    paperDesc: "Brown corrugated boxes, scrap copy paper, books, and cartons.",
 
-    // Misc
-    times: "Times",
+    calcBadge: "Scale Simulator",
+    calcTitle: "RECOIN Earnings Calculator",
+    calcSelectTrash: "Select Material:",
+    calcEstWeight: "Estimated Scale Weight",
+    calcPotentialCoins: "Potential Coins Earned",
+    calcNote: "Coins are credited instantly to your account wallet once verified at the Kiosk.",
+
+    kioskTitle: "Weighing & Coin Exchange Kiosk",
+    kioskSubtitleConnected: "Connected Account:",
+    kioskSubtitleGuest: "Operating as Guest. Sign in to credit coins directly to your wallet.",
+    stepDepositTitle: "Deposit Recyclables & Claim Coins",
+    stepDepositLabelCategory: "Select Waste Category",
+    stepDepositSensorLabel: "Precision Scale Sensor (Grams)",
+    stepDepositPayoutLabel: "RECOIN Earned:",
+    stepDepositBtn: "DEPOSIT & CLAIM RECOIN NOW",
+    stepDepositProcessing: "Measuring & Verifying Material...",
+
+    stepWithdrawTitle: "Redeem Coins & Cash Out to E-Wallet",
+    stepWithdrawCoinsLabel: "Coins to Redeem",
+    stepWithdrawEstRupiah: "Estimated Cash Payout",
+    stepWithdrawRateNote: "1 Coin = Rp10",
+    stepWithdrawEwalletLabel: "Destination E-Wallet",
+    stepWithdrawPhoneLabel: "Account Mobile Number",
+    stepWithdrawBtn: "REDEEM COINS & WITHDRAW NOW",
+    stepWithdrawProcessing: "Transferring Balance to E-Wallet...",
+
+    withdrawErrLogin: "Please log in first to redeem your coins.",
+    withdrawErrAmount: "Please enter a valid coin amount to redeem.",
+    withdrawErrInsufficient: "Insufficient coin balance in your wallet.",
+    withdrawErrPhone: "Mobile account number is required.",
+
+    receiptDepositSuccess: "Deposit Completed",
+    receiptDepositDesc: "Coins successfully added to your wallet account",
+    receiptWithdrawSuccess: "Withdrawal Completed",
+    receiptWithdrawDesc: "Funds transferred successfully to e-wallet",
+    receiptId: "Transaction ID",
+    receiptTime: "Timestamp",
+    receiptDepositor: "Depositor",
+    receiptRecipient: "Recipient",
+    receiptTrashType: "Waste Type",
+    receiptWeight: "Total Weight",
+    receiptEstRate: "Estimated Cash Value",
+    receiptEwallet: "Target E-Wallet",
+    receiptPhone: "Account Mobile",
+    receiptCoinsExchanged: "Coins Redeemed",
+    receiptStatus: "Transaction Status",
+    receiptStatusSuccess: "Successfully Credited",
+    receiptStatusWithdrawn: "Successfully Dispatched",
+    btnWeighAgain: "Weigh Again",
+    btnRedeemCoins: "Redeem Coins",
+    btnBackHome: "Back to Home",
+    btnDone: "Finished",
+
+    footerText: "© 2026 RECOIN Eco-Smart Vending Machine Platform.",
   },
 };
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: typeof translations.id;
+  toggleLanguage: () => void;
+  t: Translations;
 }
 
 const LanguageContext = createContext<LanguageContextType>({
   language: "id",
   setLanguage: () => {},
-  t: translations.id,
+  toggleLanguage: () => {},
+  t: dictionaries.id,
 });
 
-export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>("id");
 
   useEffect(() => {
-    const saved = localStorage.getItem("recoin_language") as Language;
+    const saved = localStorage.getItem("recoin_lang") as Language;
     if (saved === "id" || saved === "en") {
       setLanguageState(saved);
     }
@@ -165,7 +328,13 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem("recoin_language", lang);
+    localStorage.setItem("recoin_lang", lang);
+    window.dispatchEvent(new Event("recoin_lang_changed"));
+  };
+
+  const toggleLanguage = () => {
+    const nextLang = language === "id" ? "en" : "id";
+    setLanguage(nextLang);
   };
 
   return (
@@ -173,12 +342,15 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
       value={{
         language,
         setLanguage,
-        t: translations[language],
+        toggleLanguage,
+        t: dictionaries[language],
       }}
     >
       {children}
     </LanguageContext.Provider>
   );
-};
+}
 
-export const useLanguage = () => useContext(LanguageContext);
+export function useLanguage() {
+  return useContext(LanguageContext);
+}
